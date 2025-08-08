@@ -1,4639 +1,1959 @@
 <!DOCTYPE html>
-
 <html lang="sv">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Tidsrapportering Portal</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
         body { font-family: 'Inter', sans-serif; }
-
     </style>
-
 </head>
-
 <body class="bg-gradient-to-br from-gray-900 to-black min-h-screen text-white">
-
     <!-- Login Screen -->
-
     <div id="loginScreen" class="min-h-screen flex items-center justify-center">
-
         <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8 w-full max-w-md">
-
             <div class="text-center mb-8">
-
                 <h1 class="text-3xl font-bold text-white mb-2">Tidsrapportering</h1>
-
                 <p class="text-gray-300">Logga in för att fortsätta</p>
-
             </div>
-
             
-
             <div class="space-y-4">
-
                 <div>
-
                     <label class="block text-sm font-medium text-gray-300 mb-2">Användarnamn</label>
-
                     <input type="text" id="usernameInput" placeholder="Ange användarnamn" class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                 </div>
-
                 <div>
-
                     <label class="block text-sm font-medium text-gray-300 mb-2">Lösenord</label>
-
                     <input type="password" id="passwordInput" placeholder="Ange lösenord" class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                 </div>
-
                 <button onclick="login()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg">
-
                     Logga in
-
                 </button>
-
                 <div id="loginError" class="hidden bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
-
                     Felaktigt användarnamn eller lösenord
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <!-- Main Application -->
-
     <div id="mainApp" class="hidden">
-
         <div class="container mx-auto px-4 py-8">
-
             <!-- Header -->
-
             <div class="flex justify-between items-center mb-8">
-
                 <div>
-
                     <h1 class="text-4xl font-bold text-white mb-2">Tidsrapportering Portal</h1>
-
                     <p class="text-gray-300" id="welcomeText">Välkommen!</p>
-
                 </div>
-
                 <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors shadow-lg">
-
                     Logga ut
-
                 </button>
-
             </div>
 
             <!-- Navigation Tabs -->
-
             <div class="flex justify-center mb-8">
-
                 <div class="bg-gray-800 border border-gray-700 rounded-lg p-1 shadow-2xl" id="navigationTabs">
-
                     <button onclick="showTab('register')" id="registerTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 bg-blue-600 text-white">
-
                         Registrera Tid
-
                     </button>
-
                     <button onclick="showTab('myreports')" id="myreportsTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700">
-
                         Mina Rapporter
-
                     </button>
-
                     <button onclick="showTab('summary')" id="summaryTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700 hidden" data-admin="true">
-
                         Översikt
-
                     </button>
-
                     <button onclick="showTab('admin')" id="adminTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700 hidden" data-admin="true">
-
                         Administration
-
                     </button>
-
                     <button onclick="showTab('absence')" id="absenceTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700 hidden" data-admin="true">
-
                         Frånvaro
-
                     </button>
-
                     <button onclick="showTab('vacation')" id="vacationTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700 hidden" data-admin="true">
-
                         Semester
-
                     </button>
-
                     <button onclick="showTab('users')" id="usersTab" class="px-6 py-3 rounded-md font-medium transition-all duration-200 text-gray-300 hover:text-blue-400 hover:bg-gray-700 hidden" data-admin="true">
-
                         Användarhantering
-
                     </button>
-
                 </div>
-
             </div>
 
             <!-- Register Time Tab -->
-
             <div id="registerContent" class="max-w-2xl mx-auto">
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8">
-
                     <h2 class="text-2xl font-semibold text-white mb-6">Registrera Arbetstid</h2>
-
                     
-
                     <form id="timeForm" class="space-y-6">
-
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Datum</label>
-
                                 <input type="date" id="dateInput" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                             </div>
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Starttid</label>
-
                                 <input type="time" id="startTimeInput" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                             </div>
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Sluttid</label>
-
                                 <input type="time" id="endTimeInput" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                             </div>
-
                         </div>
 
                         <!-- Time Calculation Display -->
-
                         <div class="bg-gray-700 border border-gray-600 rounded-lg p-4">
-
                             <div class="grid grid-cols-3 gap-4 text-center">
-
                                 <div>
-
                                     <p class="text-sm text-gray-300">Arbetstid (brutto)</p>
-
                                     <p class="text-lg font-semibold text-blue-400" id="grossHours">0.0h</p>
-
                                 </div>
-
                                 <div>
-
                                     <p class="text-sm text-gray-300">Lunchavdrag</p>
-
                                     <p class="text-lg font-semibold text-orange-400" id="lunchDeduction">0.0h</p>
-
                                 </div>
-
                                 <div>
-
                                     <p class="text-sm text-gray-300">Arbetstid (netto)</p>
-
                                     <p class="text-lg font-semibold text-green-400" id="netHours">0.0h</p>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div>
-
                             <label class="block text-sm font-medium text-gray-300 mb-2">Segment</label>
-
                             <div class="space-y-3">
-
                                 <div class="flex items-center">
-
                                     <input type="radio" id="singleSegment" name="segmentMode" value="single" checked class="mr-2">
-
                                     <label for="singleSegment" class="text-sm text-gray-300">Ett segment hela dagen</label>
-
                                 </div>
-
                                 <div class="flex items-center">
-
                                     <input type="radio" id="multipleSegments" name="segmentMode" value="multiple" class="mr-2">
-
                                     <label for="multipleSegments" class="text-sm text-gray-300">Dela upp mellan flera segment</label>
-
                                 </div>
-
                             </div>
-
                             
-
                             <!-- Single segment selection -->
-
                             <div id="singleSegmentDiv" class="mt-3">
-
                                 <select id="segmentSelect" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
                                     <option value="">Välj segment...</option>
-
                                     <option value="Service">Service</option>
-
                                     <option value="Support">Support</option>
-
                                     <option value="Rental">Rental</option>
-
                                 </select>
-
                             </div>
-
                             
-
                             <!-- Multiple segments distribution -->
-
                             <div id="multipleSegmentsDiv" class="mt-3 space-y-3 hidden">
-
                                 <div class="bg-gray-700 border border-gray-600 rounded-lg p-4">
-
                                     <h4 class="text-sm font-medium text-gray-300 mb-3">Fördela arbetstid mellan segment</h4>
-
                                     <div class="space-y-3">
-
                                         <div class="flex items-center justify-between">
-
                                             <label class="text-sm text-gray-300">Service:</label>
-
                                             <div class="flex items-center space-x-2">
-
-                                                <input type="number" id="serviceHours" min="0" max="24" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
-
+                                                <input type="number" id="serviceHours" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
                                                 <span class="text-sm text-gray-300">timmar</span>
-
                                             </div>
-
                                         </div>
-
                                         <div class="flex items-center justify-between">
-
                                             <label class="text-sm text-gray-300">Support:</label>
-
                                             <div class="flex items-center space-x-2">
-
-                                                <input type="number" id="supportHours" min="0" max="24" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
-
+                                                <input type="number" id="supportHours" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
                                                 <span class="text-sm text-gray-300">timmar</span>
-
                                             </div>
-
                                         </div>
-
                                         <div class="flex items-center justify-between">
-
                                             <label class="text-sm text-gray-300">Rental:</label>
-
                                             <div class="flex items-center space-x-2">
-
-                                                <input type="number" id="rentalHours" min="0" max="24" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
-
+                                                <input type="number" id="rentalHours" step="0.5" placeholder="0" class="w-20 p-2 bg-gray-600 border border-gray-500 text-white rounded text-sm">
                                                 <span class="text-sm text-gray-300">timmar</span>
-
                                             </div>
-
                                         </div>
-
                                     </div>
-
                                     <div class="mt-3 pt-3 border-t border-gray-600">
-
                                         <div class="flex justify-between items-center text-sm">
-
                                             <span class="text-gray-300">Totalt fördelat:</span>
-
                                             <span id="totalDistributed" class="font-medium text-blue-400">0.0h</span>
-
                                         </div>
-
                                         <div class="flex justify-between items-center text-sm mt-1">
-
                                             <span class="text-gray-300">Arbetstid (netto):</span>
-
                                             <span id="netHoursForDistribution" class="font-medium text-green-400">0.0h</span>
-
                                         </div>
-
                                         <button type="button" onclick="autoDistributeEvenly()" class="mt-2 w-full bg-gray-600 text-white py-2 px-3 rounded text-xs hover:bg-gray-500 transition-colors">
-
                                             Fördela Jämnt
-
                                         </button>
-
                                         <div id="distributionWarning" class="hidden mt-2 p-2 bg-yellow-900 border border-yellow-700 rounded text-xs text-yellow-300">
-
                                             Varning: Fördelad tid matchar inte arbetstiden
-
                                         </div>
-
                                     </div>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div>
-
                             <label class="block text-sm font-medium text-gray-300 mb-2">Arbetsuppgifter *</label>
-
                             <textarea id="taskInput" rows="3" placeholder="Beskriv dagens arbetsuppgifter..." class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required></textarea>
-
                         </div>
 
                         <!-- Overtime/Comp Time Display -->
-
                         <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-4" id="overtimeDisplay" style="display: none;">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-yellow-300">Övertid Upptäckt</p>
-
                                     <p class="text-xs text-yellow-400">Arbetstid över 8 timmar konverteras automatiskt till komptid</p>
-
                                 </div>
-
                                 <div class="text-right">
-
                                     <p class="text-sm text-yellow-300">Komptid: <span id="compTimeAmount" class="font-semibold">0.0h</span></p>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div>
-
                             <label class="block text-sm font-medium text-gray-300 mb-2">Kommentar (valfritt)</label>
-
                             <textarea id="commentInput" rows="2" placeholder="T.ex. resor, särskilda omständigheter, etc..." class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-
                         </div>
 
                         <div class="flex gap-4">
-
                             <button type="button" onclick="copyPreviousDay()" class="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200 shadow-lg">
-
                                 Kopiera Föregående Dag
-
                             </button>
-
                             <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 shadow-lg">
-
                                 Registrera Tid
-
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
 
                 <!-- Week Summary for Current User -->
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6 mt-6">
-
                     <h3 class="text-lg font-semibold text-white mb-4">Denna Vecka</h3>
-
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-
                         <div class="text-center">
-
                             <p class="text-2xl font-bold text-blue-400" id="weekHours">0h</p>
-
                             <p class="text-sm text-gray-300">Totalt</p>
-
                         </div>
-
                         <div class="text-center">
-
                             <p class="text-2xl font-bold text-green-400" id="weekService">0h</p>
-
                             <p class="text-sm text-gray-300">Service</p>
-
                         </div>
-
                         <div class="text-center">
-
                             <p class="text-2xl font-bold text-purple-400" id="weekSupport">0h</p>
-
                             <p class="text-sm text-gray-300">Support</p>
-
                         </div>
-
                         <div class="text-center">
-
                             <p class="text-2xl font-bold text-orange-400" id="weekRental">0h</p>
-
                             <p class="text-sm text-gray-300">Rental</p>
-
                         </div>
-
                         <div class="text-center">
-
                             <p class="text-2xl font-bold text-yellow-400" id="weekCompTime">0h</p>
-
                             <p class="text-sm text-gray-300">Komptid</p>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- Comp Time Balance -->
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6 mt-6">
-
                     <h3 class="text-lg font-semibold text-white mb-4">Komptid Saldo</h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
                         <div class="text-center p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-yellow-400" id="totalCompTime">0h</p>
-
                             <p class="text-sm text-gray-300">Totalt Komptid</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-green-900 border border-green-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-green-400" id="usedCompTime">0h</p>
-
                             <p class="text-sm text-gray-300">Använd Komptid</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-blue-900 border border-blue-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-blue-400" id="remainingCompTime">0h</p>
-
                             <p class="text-sm text-gray-300">Kvarvarande</p>
-
                         </div>
-
                     </div>
-
                     <div class="mt-4 p-3 bg-gray-700 border border-gray-600 rounded-lg">
-
                         <p class="text-xs text-gray-300">
-
                             <strong>OBS:</strong> Komptid förfaller automatiskt efter 3 månader från intjänandedatum
-
                         </p>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- My Reports Tab -->
-
             <div id="myreportsContent" class="hidden max-w-6xl mx-auto">
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6 mb-6">
-
                     <div class="flex justify-between items-center mb-4">
-
                         <h2 class="text-2xl font-semibold text-white">Mina Rapporter</h2>
-
                         <div class="flex gap-4">
-
                             <select id="monthFilter" class="p-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500">
-
                                 <option value="">Alla månader</option>
-
                                 <option value="2024-01">Januari 2024</option>
-
                                 <option value="2024-02">Februari 2024</option>
-
                                 <option value="2024-03">Mars 2024</option>
-
                                 <option value="2024-04">April 2024</option>
-
                                 <option value="2024-05">Maj 2024</option>
-
                                 <option value="2024-06">Juni 2024</option>
-
                                 <option value="2024-07">Juli 2024</option>
-
                                 <option value="2024-08">Augusti 2024</option>
-
                                 <option value="2024-09">September 2024</option>
-
                                 <option value="2024-10">Oktober 2024</option>
-
                                 <option value="2024-11">November 2024</option>
-
                                 <option value="2024-12">December 2024</option>
-
                             </select>
-
                         </div>
-
                     </div>
-
                     
-
                     <!-- Personal Summary Cards -->
-
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-
                         <div class="text-center p-4 bg-blue-900 border border-blue-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-blue-400" id="myTotalHours">0h</p>
-
                             <p class="text-sm text-gray-300">Totalt denna månad</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-green-900 border border-green-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-green-400" id="myServiceHours">0h</p>
-
                             <p class="text-sm text-gray-300">Service</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-purple-900 border border-purple-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-purple-400" id="mySupportHours">0h</p>
-
                             <p class="text-sm text-gray-300">Support</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-orange-900 border border-orange-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-orange-400" id="myRentalHours">0h</p>
-
                             <p class="text-sm text-gray-300">Rental</p>
-
                         </div>
-
                         <div class="text-center p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
-
                             <p class="text-2xl font-bold text-yellow-400" id="myCompTimeHours">0h</p>
-
                             <p class="text-sm text-gray-300">Komptid</p>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- My Time Entries Table -->
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
-
                     <div class="px-6 py-4 border-b border-gray-700">
-
                         <h3 class="text-lg font-semibold text-white">Mina Tidsrapporter</h3>
-
                     </div>
-
                     <div class="overflow-x-auto">
-
                         <table class="w-full">
-
                             <thead class="bg-gray-700">
-
                                 <tr>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Datum</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Starttid</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Sluttid</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Arbetstid</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Komptid</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Segment</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Arbetsuppgifter</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Kommentar</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Åtgärder</th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="myReportsTableBody" class="bg-gray-800 divide-y divide-gray-700">
-
                                 <!-- Data will be populated by JavaScript -->
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- Summary Tab (Admin) -->
-
             <div id="summaryContent" class="hidden">
-
                 <div class="max-w-6xl mx-auto">
-
                     <!-- Filter Controls -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Från Datum</label>
-
                                 <input type="date" id="fromDate" class="w-full p-2 border border-gray-300 rounded-lg">
-
                             </div>
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Till Datum</label>
-
                                 <input type="date" id="toDate" class="w-full p-2 border border-gray-300 rounded-lg">
-
                             </div>
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Personal</label>
-
                                 <select id="employeeFilter" class="w-full p-2 border border-gray-300 rounded-lg">
-
                                     <option value="">Alla anställda</option>
-
-                                    <option value="Ivan">Ivan</option>
-
-                                    <option value="Dragan">Dragan</option>
-
-                                    <option value="Elliot">Elliot</option>
-
-                                    <option value="Viggo">Viggo</option>
-
-                                    <option value="Anders">Anders</option>
-
-                                    <option value="Per">Per</option>
-
-                                    <option value="Alexander">Alexander</option>
-
-                                    <option value="Olle">Olle</option>
-
+                                    <!-- Options will be populated dynamically -->
                                 </select>
-
                             </div>
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Segment</label>
-
                                 <select id="segmentFilter" class="w-full p-2 border border-gray-300 rounded-lg">
-
                                     <option value="">Alla segment</option>
-
                                     <option value="Service">Service</option>
-
-                                    <option value="Install">Install</option>
-
+                                    <option value="Support">Support</option>
                                     <option value="Rental">Rental</option>
-
                                 </select>
-
                             </div>
-
                         </div>
-
                         <div class="mt-4 flex gap-4">
-
                             <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-
                                 Tillämpa Filter
-
                             </button>
-
                             <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-
                                 Exportera CSV
-
                             </button>
-
                         </div>
-
                     </div>
 
                     <!-- Summary Cards -->
-
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-
                         <div class="bg-white rounded-xl shadow-lg p-6">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-gray-600">Totalt</p>
-
                                     <p class="text-3xl font-bold text-gray-800" id="totalHours">0h</p>
-
                                 </div>
-
                                 <div class="bg-gray-100 p-3 rounded-full">
-
                                     <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-gray-600">Service</p>
-
                                     <p class="text-3xl font-bold text-blue-600" id="serviceHours">0h</p>
-
                                 </div>
-
                                 <div class="bg-blue-100 p-3 rounded-full">
-
                                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-gray-600">Support</p>
-
                                     <p class="text-3xl font-bold text-purple-600" id="supportHours">0h</p>
-
                                 </div>
-
                                 <div class="bg-purple-100 p-3 rounded-full">
-
                                     <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
-
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-gray-600">Rental</p>
-
                                     <p class="text-3xl font-bold text-green-600" id="rentalHours">0h</p>
-
                                 </div>
-
                                 <div class="bg-green-100 p-3 rounded-full">
-
                                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
-
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                         <div class="bg-white rounded-xl shadow-lg p-6">
-
                             <div class="flex items-center justify-between">
-
                                 <div>
-
                                     <p class="text-sm font-medium text-gray-600">Komptid</p>
-
                                     <p class="text-3xl font-bold text-yellow-600" id="compTimeHours">0h</p>
-
                                 </div>
-
                                 <div class="bg-yellow-100 p-3 rounded-full">
-
                                     <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-
                                     </svg>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <!-- Top Performers -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Topp 5 Mest Aktiva</h3>
-
                         <div id="topPerformers" class="space-y-3">
-
                             <!-- Will be populated by JavaScript -->
-
                         </div>
-
                     </div>
 
                     <!-- All Employees Summary -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Summering Alla Anställda</h3>
-
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="allEmployeesSummary">
-
                             <!-- Will be populated by JavaScript -->
-
                         </div>
-
                     </div>
 
                     <!-- Detailed Summary Table -->
-
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-
                         <div class="px-6 py-4 border-b border-gray-200">
-
                             <h3 class="text-lg font-semibold text-gray-800">Detaljerad Översikt</h3>
-
                         </div>
-
                         <div class="overflow-x-auto">
-
                             <table class="w-full">
-
                                 <thead class="bg-gray-50">
-
                                     <tr>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personal</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Totala Timmar</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Support</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rental</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Senaste Registrering</th>
-
                                     </tr>
-
                                 </thead>
-
                                 <tbody id="summaryTableBody" class="bg-white divide-y divide-gray-200">
-
                                     <!-- Data will be populated by JavaScript -->
-
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- Absence Tab (Admin) -->
-
             <div id="absenceContent" class="hidden max-w-6xl mx-auto">
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
                     <!-- Register Absence -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6">
-
                         <h2 class="text-2xl font-semibold text-gray-800 mb-6">Registrera Frånvaro</h2>
-
                         
-
                         <form id="absenceForm" class="space-y-4">
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Personal</label>
-
                                 <select id="absenceEmployee" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                     <option value="">Välj personal...</option>
-
-                                    <option value="Ivan">Ivan</option>
-
-                                    <option value="Dragan">Dragan</option>
-
-                                    <option value="Elliot">Elliot</option>
-
-                                    <option value="Viggo">Viggo</option>
-
-                                    <option value="Anders">Anders</option>
-
-                                    <option value="Per">Per</option>
-
-                                    <option value="Alexander">Alexander</option>
-
-                                    <option value="Olle">Olle</option>
-
+                                    <!-- Options will be populated dynamically -->
                                 </select>
-
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-
                                 <div>
-
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Från Datum</label>
-
                                     <input type="date" id="absenceFromDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                 </div>
-
                                 <div>
-
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Till Datum</label>
-
                                     <input type="date" id="absenceToDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                 </div>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Typ av Frånvaro</label>
-
                                 <select id="absenceType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                     <option value="">Välj typ...</option>
-
                                     <option value="Sjukdom">Sjukdom</option>
-
                                     <option value="VAB">VAB (Vård av barn)</option>
-
                                     <option value="Föräldraledighet">Föräldraledighet</option>
-
                                     <option value="Tjänstledighet">Tjänstledighet</option>
-
                                     <option value="Komptid">Komptid</option>
-
                                     <option value="Övrigt">Övrigt</option>
-
                                 </select>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Kommentar (valfritt)</label>
-
                                 <textarea id="absenceComment" rows="3" placeholder="T.ex. läkarintyg, planerad operation, etc..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-
                             </div>
 
                             <button type="submit" class="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors">
-
                                 Registrera Frånvaro
-
                             </button>
-
                         </form>
-
                     </div>
 
                     <!-- Absence Statistics -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6">
-
                         <h3 class="text-xl font-semibold text-gray-800 mb-6">Frånvarostatistik</h3>
-
                         
-
                         <!-- Summary Cards -->
-
                         <div class="grid grid-cols-2 gap-4 mb-6">
-
                             <div class="text-center p-4 bg-red-50 rounded-lg">
-
                                 <p class="text-2xl font-bold text-red-600" id="currentAbsences">0</p>
-
                                 <p class="text-sm text-gray-600">Aktuell Frånvaro</p>
-
                             </div>
-
                             <div class="text-center p-4 bg-yellow-50 rounded-lg">
-
                                 <p class="text-2xl font-bold text-yellow-600" id="compTimeUsed">0</p>
-
                                 <p class="text-sm text-gray-600">Komptid Använd</p>
-
                             </div>
-
                         </div>
 
                         <!-- Quick Stats -->
-
                         <div class="space-y-3">
-
                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-
                                 <span class="text-sm font-medium text-gray-700">Sjukdom (denna månad)</span>
-
                                 <span class="text-sm font-bold text-red-600" id="sickDaysMonth">0 dagar</span>
-
                             </div>
-
                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-
                                 <span class="text-sm font-medium text-gray-700">VAB (denna månad)</span>
-
                                 <span class="text-sm font-bold text-orange-600" id="vabDaysMonth">0 dagar</span>
-
                             </div>
-
                             <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-
                                 <span class="text-sm font-medium text-gray-700">Komptid (denna månad)</span>
-
                                 <span class="text-sm font-bold text-yellow-600" id="compTimeDaysMonth">0 dagar</span>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- Current Absences Overview -->
-
                 <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-
                     <div class="flex justify-between items-center mb-6">
-
                         <h3 class="text-xl font-semibold text-gray-800">Aktuell Frånvaro</h3>
-
                         <div class="flex gap-2">
-
                             <select id="absenceFilterType" class="p-2 border border-gray-300 rounded-lg text-sm">
-
                                 <option value="">Alla typer</option>
-
                                 <option value="Sjukdom">Sjukdom</option>
-
                                 <option value="VAB">VAB</option>
-
                                 <option value="Föräldraledighet">Föräldraledighet</option>
-
                                 <option value="Tjänstledighet">Tjänstledighet</option>
-
                                 <option value="Komptid">Komptid</option>
-
                                 <option value="Övrigt">Övrigt</option>
-
                             </select>
-
                             <select id="absenceFilterEmployee" class="p-2 border border-gray-300 rounded-lg text-sm">
-
                                 <option value="">Alla anställda</option>
-
-                                <option value="Ivan">Ivan</option>
-
-                                <option value="Dragan">Dragan</option>
-
-                                <option value="Elliot">Elliot</option>
-
-                                <option value="Viggo">Viggo</option>
-
-                                <option value="Anders">Anders</option>
-
-                                <option value="Per">Per</option>
-
-                                <option value="Alexander">Alexander</option>
-
-                                <option value="Olle">Olle</option>
-
+                                <!-- Options will be populated dynamically -->
                             </select>
-
                         </div>
-
                     </div>
 
                     <!-- Absences Table -->
-
                     <div class="overflow-x-auto">
-
                         <table class="w-full">
-
                             <thead class="bg-gray-50">
-
                                 <tr>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personal</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Typ</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Från</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Till</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dagar</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kommentar</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Åtgärder</th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="absencesTableBody" class="bg-white divide-y divide-gray-200">
-
                                 <!-- Data will be populated by JavaScript -->
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- Vacation Tab (Admin) -->
-
             <div id="vacationContent" class="hidden max-w-6xl mx-auto">
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
                     <!-- Plan Vacation -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6">
-
                         <h2 class="text-2xl font-semibold text-gray-800 mb-6">Planera Semester</h2>
-
                         
-
                         <form id="vacationForm" class="space-y-4">
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Personal</label>
-
                                 <select id="vacationEmployee" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                     <option value="">Välj personal...</option>
-
-                                    <option value="Ivan">Ivan</option>
-
-                                    <option value="Dragan">Dragan</option>
-
-                                    <option value="Elliot">Elliot</option>
-
-                                    <option value="Viggo">Viggo</option>
-
-                                    <option value="Anders">Anders</option>
-
-                                    <option value="Per">Per</option>
-
-                                    <option value="Alexander">Alexander</option>
-
-                                    <option value="Olle">Olle</option>
-
+                                    <!-- Options will be populated dynamically -->
                                 </select>
-
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-
                                 <div>
-
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Från Datum</label>
-
                                     <input type="date" id="vacationFromDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                 </div>
-
                                 <div>
-
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Till Datum</label>
-
                                     <input type="date" id="vacationToDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                 </div>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-
                                 <select id="vacationStatus" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                                     <option value="Planerad">Planerad</option>
-
                                     <option value="Godkänd">Godkänd</option>
-
                                     <option value="Avslutad">Avslutad</option>
-
                                 </select>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Anteckningar (valfritt)</label>
-
                                 <textarea id="vacationNotes" rows="3" placeholder="T.ex. vikarie arrangerad, projekt pausat, etc..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-
                             </div>
 
                             <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 transition-colors">
-
                                 Planera Semester
-
                             </button>
-
                         </form>
-
                     </div>
 
                     <!-- Vacation Statistics -->
-
                     <div class="bg-white rounded-xl shadow-lg p-6">
-
                         <h3 class="text-xl font-semibold text-gray-800 mb-6">Semesterstatistik</h3>
-
                         
-
                         <!-- Summary Cards -->
-
                         <div class="grid grid-cols-2 gap-4 mb-6">
-
                             <div class="text-center p-4 bg-green-50 rounded-lg">
-
                                 <p class="text-2xl font-bold text-green-600" id="plannedVacations">0</p>
-
                                 <p class="text-sm text-gray-600">Planerad Semester</p>
-
                             </div>
-
                             <div class="text-center p-4 bg-blue-50 rounded-lg">
-
                                 <p class="text-2xl font-bold text-blue-600" id="approvedVacations">0</p>
-
                                 <p class="text-sm text-gray-600">Godkänd Semester</p>
-
                             </div>
-
                         </div>
 
                         <!-- Upcoming Vacations -->
-
                         <div class="space-y-3">
-
                             <h4 class="font-medium text-gray-800">Kommande Semester</h4>
-
                             <div id="upcomingVacations" class="space-y-2">
-
                                 <!-- Will be populated by JavaScript -->
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- Vacation Calendar View -->
-
                 <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-
                     <h3 class="text-xl font-semibold text-gray-800 mb-6">Semesterkalender</h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="vacationCalendar">
-
                         <!-- Will be populated by JavaScript -->
-
                     </div>
-
                 </div>
 
                 <!-- All Vacations Table -->
-
                 <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-
                     <div class="flex justify-between items-center mb-6">
-
                         <h3 class="text-xl font-semibold text-gray-800">Alla Semesterplaner</h3>
-
                         <div class="flex gap-2">
-
                             <select id="vacationFilterStatus" class="p-2 border border-gray-300 rounded-lg text-sm">
-
                                 <option value="">Alla statusar</option>
-
                                 <option value="Planerad">Planerad</option>
-
                                 <option value="Godkänd">Godkänd</option>
-
                                 <option value="Avslutad">Avslutad</option>
-
                             </select>
-
                             <select id="vacationFilterEmployee" class="p-2 border border-gray-300 rounded-lg text-sm">
-
                                 <option value="">Alla anställda</option>
-
-                                <option value="Ivan">Ivan</option>
-
-                                <option value="Dragan">Dragan</option>
-
-                                <option value="Elliot">Elliot</option>
-
-                                <option value="Viggo">Viggo</option>
-
-                                <option value="Anders">Anders</option>
-
-                                <option value="Per">Per</option>
-
-                                <option value="Alexander">Alexander</option>
-
-                                <option value="Olle">Olle</option>
-
+                                <!-- Options will be populated dynamically -->
                             </select>
-
                         </div>
-
                     </div>
 
                     <!-- Vacations Table -->
-
                     <div class="overflow-x-auto">
-
                         <table class="w-full">
-
                             <thead class="bg-gray-50">
-
                                 <tr>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personal</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Från</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Till</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dagar</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anteckningar</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Åtgärder</th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="vacationsTableBody" class="bg-white divide-y divide-gray-200">
-
                                 <!-- Data will be populated by JavaScript -->
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- User Management Tab (Admin) -->
-
             <div id="usersContent" class="hidden max-w-6xl mx-auto">
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
                     <!-- Create New User -->
-
                     <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6">
-
                         <h2 class="text-2xl font-semibold text-white mb-6">Skapa Ny Användare</h2>
-
                         
-
                         <form id="createUserForm" class="space-y-4">
-
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Användarnamn *</label>
-
                                 <input type="text" id="newUsername" placeholder="t.ex. ivan.andersson" class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Lösenord *</label>
-
                                 <input type="password" id="newPassword" placeholder="Minst 6 tecken" class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Fullständigt Namn *</label>
-
                                 <input type="text" id="newFullName" placeholder="t.ex. Ivan Andersson" class="w-full p-3 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Avdelning</label>
-
                                 <select id="newDepartment" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500">
-
                                     <option value="Service">Service</option>
-
                                     <option value="Support">Support</option>
-
                                     <option value="Rental">Rental</option>
-
                                     <option value="Administration">Administration</option>
-
                                 </select>
-
                             </div>
 
                             <div>
-
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Roll</label>
-
                                 <select id="newRole" class="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500">
-
                                     <option value="user">Användare</option>
-
                                     <option value="admin">Administratör</option>
-
                                 </select>
-
                             </div>
 
                             <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 transition-colors shadow-lg">
-
                                 Skapa Användare
-
                             </button>
-
                         </form>
-
                     </div>
 
                     <!-- User Statistics -->
-
                     <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6">
-
                         <h3 class="text-xl font-semibold text-white mb-6">Användarstatistik</h3>
-
                         
-
                         <!-- Summary Cards -->
-
                         <div class="grid grid-cols-2 gap-4 mb-6">
-
                             <div class="text-center p-4 bg-blue-900 border border-blue-700 rounded-lg">
-
                                 <p class="text-2xl font-bold text-blue-400" id="totalUsers">0</p>
-
                                 <p class="text-sm text-gray-300">Totalt Användare</p>
-
                             </div>
-
                             <div class="text-center p-4 bg-green-900 border border-green-700 rounded-lg">
-
                                 <p class="text-2xl font-bold text-green-400" id="activeUsers">0</p>
-
                                 <p class="text-sm text-gray-300">Aktiva Användare</p>
-
                             </div>
-
                         </div>
 
                         <!-- Recent Activity -->
-
                         <div class="space-y-3">
-
                             <h4 class="font-medium text-white">Senaste Inloggningar</h4>
-
                             <div id="recentLogins" class="space-y-2">
-
                                 <!-- Will be populated by JavaScript -->
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <!-- All Users Table -->
-
                 <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-6 mt-6">
-
                     <div class="flex justify-between items-center mb-6">
-
                         <h3 class="text-xl font-semibold text-white">Alla Användare</h3>
-
                         <div class="flex gap-2">
-
                             <select id="userFilterRole" class="p-2 bg-gray-700 border border-gray-600 text-white rounded-lg text-sm">
-
                                 <option value="">Alla roller</option>
-
                                 <option value="admin">Administratörer</option>
-
                                 <option value="user">Användare</option>
-
                             </select>
-
                             <select id="userFilterStatus" class="p-2 bg-gray-700 border border-gray-600 text-white rounded-lg text-sm">
-
                                 <option value="">Alla statusar</option>
-
                                 <option value="active">Aktiva</option>
-
                                 <option value="inactive">Inaktiva</option>
-
                             </select>
-
                         </div>
-
                     </div>
 
                     <!-- Users Table -->
-
                     <div class="overflow-x-auto">
-
                         <table class="w-full">
-
                             <thead class="bg-gray-700">
-
                                 <tr>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Användarnamn</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Namn</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Avdelning</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Roll</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Senaste Inloggning</th>
-
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Åtgärder</th>
-
                                 </tr>
-
                             </thead>
-
                             <tbody id="usersTableBody" class="bg-gray-800 divide-y divide-gray-700">
-
                                 <!-- Data will be populated by JavaScript -->
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
 
             <!-- Admin Tab -->
-
             <div id="adminContent" class="hidden max-w-6xl mx-auto">
-
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-
                     <h2 class="text-2xl font-semibold text-gray-800 mb-6">Administration</h2>
-
                     
-
                     <!-- Warning Messages -->
-
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-
                         <div class="flex items-center">
-
                             <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-
                             </svg>
-
                             <div>
-
                                 <h4 class="font-medium text-yellow-800">Frånvarovarningar</h4>
-
                                 <div id="absenteeWarnings" class="text-sm text-yellow-700 mt-1">
-
                                     <!-- Will be populated by JavaScript -->
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <!-- All Time Entries for Editing -->
-
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-
                         <div class="px-6 py-4 border-b border-gray-200">
-
                             <h3 class="text-lg font-semibold text-gray-800">Alla Tidsrapporter - Redigering</h3>
-
                         </div>
-
                         <div class="overflow-x-auto">
-
                             <table class="w-full">
-
                                 <thead class="bg-gray-50">
-
                                     <tr>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personal</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Starttid</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sluttid</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arbetstid</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Segment</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arbetsuppgifter</th>
-
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Åtgärder</th>
-
                                     </tr>
-
                                 </thead>
-
                                 <tbody id="adminTableBody" class="bg-white divide-y divide-gray-200">
-
                                     <!-- Data will be populated by JavaScript -->
-
                                 </tbody>
-
                             </table>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
     </div>
 
     <script>
-
         // Global variables
-
         let timeEntries = JSON.parse(localStorage.getItem('timeEntries')) || [];
-
         let compTimeEntries = JSON.parse(localStorage.getItem('compTimeEntries')) || [];
-
         let absenceEntries = JSON.parse(localStorage.getItem('absenceEntries')) || [];
-
         let vacationEntries = JSON.parse(localStorage.getItem('vacationEntries')) || [];
-
         let userAccounts = JSON.parse(localStorage.getItem('userAccounts')) || initializeDefaultUsers();
-
         let currentUser = null;
-
         let isAdmin = false;
-
         let filteredEntries = [];
 
         // Initialize default users if none exist
-
         function initializeDefaultUsers() {
-
             const defaultUsers = [
-
                 {
-
                     id: 1,
-
                     username: 'admin',
-
                     password: 'admin123',
-
                     name: 'Administratör',
-
                     role: 'admin',
-
                     department: 'Administration',
-
                     active: true,
-
                     createdAt: new Date().toISOString(),
-
                     lastLogin: null
-
                 }
-
             ];
-
             localStorage.setItem('userAccounts', JSON.stringify(defaultUsers));
-
             return defaultUsers;
-
         }
 
         // Login functionality
-
         function login() {
-
             const username = document.getElementById('usernameInput').value.trim();
-
             const password = document.getElementById('passwordInput').value;
-
             const errorDiv = document.getElementById('loginError');
 
             if (!username || !password) {
-
                 showLoginError('Vänligen fyll i både användarnamn och lösenord');
-
                 return;
-
             }
 
             // Find user in database
-
             const user = userAccounts.find(u => 
-
                 u.username === username && 
-
                 u.password === password && 
-
                 u.active
-
             );
 
             if (!user) {
-
                 showLoginError('Felaktigt användarnamn eller lösenord');
-
                 return;
-
             }
 
             // Update last login
-
             user.lastLogin = new Date().toISOString();
-
             localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
 
             // Set current user
-
             currentUser = user;
-
             isAdmin = user.role === 'admin';
 
             // Hide login screen and show main app
-
             document.getElementById('loginScreen').classList.add('hidden');
-
             document.getElementById('mainApp').classList.remove('hidden');
-
             
-
             document.getElementById('welcomeText').textContent = 
-
                 isAdmin ? `Välkommen ${user.name}!` : `Välkommen ${user.name}!`;
 
             // Show/hide admin tabs
-
             if (isAdmin) {
-
                 document.querySelectorAll('[data-admin="true"]').forEach(el => {
-
                     el.classList.remove('hidden');
-
                 });
-
             }
 
             // Set today's date as default
-
             document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
-
             
-
             // Clear login form
-
             document.getElementById('usernameInput').value = '';
-
             document.getElementById('passwordInput').value = '';
-
             errorDiv.classList.add('hidden');
-
             
-
             updateWeekSummary();
-
+            populateEmployeeDropdowns();
         }
 
         function showLoginError(message) {
-
             const errorDiv = document.getElementById('loginError');
-
             errorDiv.textContent = message;
-
             errorDiv.classList.remove('hidden');
-
             
-
             // Hide error after 5 seconds
-
             setTimeout(() => {
-
                 errorDiv.classList.add('hidden');
-
             }, 5000);
-
         }
 
         // Allow Enter key to login
-
         document.addEventListener('DOMContentLoaded', function() {
-
             document.getElementById('usernameInput').addEventListener('keypress', function(e) {
-
                 if (e.key === 'Enter') login();
-
             });
-
             document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-
                 if (e.key === 'Enter') login();
-
             });
-
         });
 
         function logout() {
-
             currentUser = null;
-
             isAdmin = false;
-
             document.getElementById('loginScreen').classList.remove('hidden');
-
             document.getElementById('mainApp').classList.add('hidden');
-
             showTab('register');
+        }
 
+        // Populate employee dropdowns dynamically
+        function populateEmployeeDropdowns() {
+            const activeEmployees = userAccounts.filter(u => u.active && u.role === 'user');
+            
+            // Employee filter dropdown
+            const employeeFilter = document.getElementById('employeeFilter');
+            if (employeeFilter) {
+                employeeFilter.innerHTML = '<option value="">Alla anställda</option>';
+                activeEmployees.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.name;
+                    option.textContent = user.name;
+                    employeeFilter.appendChild(option);
+                });
+            }
+
+            // Absence employee dropdown
+            const absenceEmployee = document.getElementById('absenceEmployee');
+            if (absenceEmployee) {
+                absenceEmployee.innerHTML = '<option value="">Välj personal...</option>';
+                activeEmployees.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.name;
+                    option.textContent = user.name;
+                    absenceEmployee.appendChild(option);
+                });
+            }
+
+            // Vacation employee dropdown
+            const vacationEmployee = document.getElementById('vacationEmployee');
+            if (vacationEmployee) {
+                vacationEmployee.innerHTML = '<option value="">Välj personal...</option>';
+                activeEmployees.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.name;
+                    option.textContent = user.name;
+                    vacationEmployee.appendChild(option);
+                });
+            }
+
+            // Absence filter employee dropdown
+            const absenceFilterEmployee = document.getElementById('absenceFilterEmployee');
+            if (absenceFilterEmployee) {
+                absenceFilterEmployee.innerHTML = '<option value="">Alla anställda</option>';
+                activeEmployees.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.name;
+                    option.textContent = user.name;
+                    absenceFilterEmployee.appendChild(option);
+                });
+            }
+
+            // Vacation filter employee dropdown
+            const vacationFilterEmployee = document.getElementById('vacationFilterEmployee');
+            if (vacationFilterEmployee) {
+                vacationFilterEmployee.innerHTML = '<option value="">Alla anställda</option>';
+                activeEmployees.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.name;
+                    option.textContent = user.name;
+                    vacationFilterEmployee.appendChild(option);
+                });
+            }
         }
 
         // Tab switching
-
         function showTab(tab) {
-
             // Hide all content
-
             document.getElementById('registerContent').classList.add('hidden');
-
             document.getElementById('myreportsContent').classList.add('hidden');
-
             document.getElementById('summaryContent').classList.add('hidden');
-
             document.getElementById('adminContent').classList.add('hidden');
-
             document.getElementById('absenceContent').classList.add('hidden');
-
             document.getElementById('vacationContent').classList.add('hidden');
-
             document.getElementById('usersContent').classList.add('hidden');
 
             // Reset all tab styles
-
             document.querySelectorAll('#navigationTabs button').forEach(btn => {
-
                 btn.classList.remove('bg-blue-600', 'text-white');
-
                 btn.classList.add('text-gray-300');
-
             });
 
             // Show selected content and highlight tab
-
             document.getElementById(tab + 'Content').classList.remove('hidden');
-
             document.getElementById(tab + 'Tab').classList.add('bg-blue-600', 'text-white');
-
             document.getElementById(tab + 'Tab').classList.remove('text-gray-300');
 
             // Update data based on tab
-
             if (tab === 'myreports') {
-
                 updateMyReports();
-
             } else if (tab === 'summary') {
-
                 updateSummary();
-
             } else if (tab === 'admin') {
-
                 updateAdminView();
-
             } else if (tab === 'absence') {
-
                 updateAbsenceView();
-
             } else if (tab === 'vacation') {
-
                 updateVacationView();
-
             } else if (tab === 'users') {
-
                 updateUsersView();
-
             } else if (tab === 'register') {
-
                 updateWeekSummary();
-
             }
-
         }
 
         // Time calculation functionality
-
         function calculateWorkingHours() {
-
             const startTime = document.getElementById('startTimeInput').value;
-
             const endTime = document.getElementById('endTimeInput').value;
 
             if (!startTime || !endTime) {
-
                 document.getElementById('grossHours').textContent = '0.0h';
-
                 document.getElementById('lunchDeduction').textContent = '0.0h';
-
                 document.getElementById('netHours').textContent = '0.0h';
-
                 document.getElementById('netHoursForDistribution').textContent = '0.0h';
-
                 document.getElementById('overtimeDisplay').style.display = 'none';
-
                 updateCommentRequirement(false);
-
                 return 0;
-
             }
 
             const start = new Date(`2000-01-01T${startTime}`);
-
             const end = new Date(`2000-01-01T${endTime}`);
-
             
-
             if (end <= start) {
-
                 document.getElementById('grossHours').textContent = '0.0h';
-
                 document.getElementById('lunchDeduction').textContent = '0.0h';
-
                 document.getElementById('netHours').textContent = '0.0h';
-
                 document.getElementById('netHoursForDistribution').textContent = '0.0h';
-
                 document.getElementById('overtimeDisplay').style.display = 'none';
-
                 updateCommentRequirement(false);
-
                 return 0;
-
             }
 
             const grossHours = (end - start) / (1000 * 60 * 60);
-
             const lunchDeduction = grossHours >= 6 ? 1 : 0; // 1h lunch if working 6+ hours
-
             const netHours = Math.max(0, grossHours - lunchDeduction);
 
             // Calculate overtime (comp time) - anything over 8 hours becomes comp time
-
             const regularHours = Math.min(netHours, 8);
-
             const compTime = Math.max(0, netHours - 8);
 
             document.getElementById('grossHours').textContent = grossHours.toFixed(1) + 'h';
-
             document.getElementById('lunchDeduction').textContent = lunchDeduction.toFixed(1) + 'h';
-
             document.getElementById('netHours').textContent = regularHours.toFixed(1) + 'h';
-
             document.getElementById('netHoursForDistribution').textContent = regularHours.toFixed(1) + 'h';
 
             // Show/hide overtime display and update comment requirement
-
             if (compTime > 0) {
-
                 document.getElementById('overtimeDisplay').style.display = 'block';
-
                 document.getElementById('compTimeAmount').textContent = compTime.toFixed(1) + 'h';
-
                 updateCommentRequirement(true);
-
             } else {
-
                 document.getElementById('overtimeDisplay').style.display = 'none';
-
                 updateCommentRequirement(false);
-
             }
 
             // Update distribution calculation if in multiple segments mode
-
             updateDistributionCalculation();
 
             return { regularHours, compTime };
-
         }
 
         // Update comment field requirement based on overtime
-
         function updateCommentRequirement(hasOvertime) {
-
             const commentInput = document.getElementById('commentInput');
-
             const commentLabel = commentInput.previousElementSibling;
-
             
-
             if (hasOvertime) {
-
                 commentInput.required = true;
-
                 commentInput.placeholder = 'Kommentar krävs vid övertid - beskriv anledning...';
-
                 commentLabel.innerHTML = 'Kommentar (obligatorisk vid övertid) <span class="text-red-500">*</span>';
-
                 commentLabel.classList.add('text-red-700');
-
             } else {
-
                 commentInput.required = false;
-
                 commentInput.placeholder = 'T.ex. resor, särskilda omständigheter, etc...';
-
                 commentLabel.innerHTML = 'Kommentar (valfritt)';
-
                 commentLabel.classList.remove('text-red-700');
-
             }
-
         }
 
         // Segment mode switching
-
         function toggleSegmentMode() {
-
             const singleMode = document.getElementById('singleSegment').checked;
-
             const singleDiv = document.getElementById('singleSegmentDiv');
-
             const multipleDiv = document.getElementById('multipleSegmentsDiv');
-
             
-
             if (singleMode) {
-
                 singleDiv.classList.remove('hidden');
-
                 multipleDiv.classList.add('hidden');
-
             } else {
-
                 singleDiv.classList.add('hidden');
-
                 multipleDiv.classList.remove('hidden');
-
                 updateDistributionCalculation();
-
             }
-
         }
 
         // Update distribution calculation
-
         function updateDistributionCalculation() {
-
             if (document.getElementById('multipleSegments').checked) {
-
                 const serviceHours = parseFloat(document.getElementById('serviceHours').value) || 0;
-
                 const supportHours = parseFloat(document.getElementById('supportHours').value) || 0;
-
                 const rentalHours = parseFloat(document.getElementById('rentalHours').value) || 0;
-
                 
-
                 const totalDistributed = serviceHours + supportHours + rentalHours;
-
                 const netHours = parseFloat(document.getElementById('netHours').textContent) || 0;
-
                 
-
                 document.getElementById('totalDistributed').textContent = totalDistributed.toFixed(1) + 'h';
-
                 
-
                 const warningDiv = document.getElementById('distributionWarning');
-
                 if (Math.abs(totalDistributed - netHours) > 0.1 && totalDistributed > 0) {
-
                     warningDiv.classList.remove('hidden');
-
                 } else {
-
                     warningDiv.classList.add('hidden');
-
                 }
-
             }
-
         }
 
         // Auto-distribute hours evenly
-
         function autoDistributeEvenly() {
-
             const netHours = parseFloat(document.getElementById('netHours').textContent) || 0;
-
             if (netHours === 0) {
-
                 alert('Ange först start- och sluttid för att beräkna arbetstiden');
-
                 return;
-
             }
-
             
-
             // Distribute evenly among all three segments
-
             const hoursPerSegment = (netHours / 3).toFixed(1);
-
             document.getElementById('serviceHours').value = hoursPerSegment;
-
             document.getElementById('supportHours').value = hoursPerSegment;
-
             document.getElementById('rentalHours').value = hoursPerSegment;
-
             
-
             updateDistributionCalculation();
-
         }
 
         // Add event listeners for time calculation
-
         document.getElementById('startTimeInput').addEventListener('change', calculateWorkingHours);
-
         document.getElementById('endTimeInput').addEventListener('change', calculateWorkingHours);
-
         
-
         // Add event listeners for segment mode
-
         document.getElementById('singleSegment').addEventListener('change', toggleSegmentMode);
-
         document.getElementById('multipleSegments').addEventListener('change', toggleSegmentMode);
-
         
-
         // Add event listeners for distribution calculation
-
         document.getElementById('serviceHours').addEventListener('input', updateDistributionCalculation);
-
         document.getElementById('supportHours').addEventListener('input', updateDistributionCalculation);
-
         document.getElementById('rentalHours').addEventListener('input', updateDistributionCalculation);
 
         // Form submission
-
         document.getElementById('timeForm').addEventListener('submit', function(e) {
-
             e.preventDefault();
-
             
-
             const date = document.getElementById('dateInput').value;
-
             const startTime = document.getElementById('startTimeInput').value;
-
             const endTime = document.getElementById('endTimeInput').value;
-
             const tasks = document.getElementById('taskInput').value;
-
             const comment = document.getElementById('commentInput').value;
-
             const isMultipleSegments = document.getElementById('multipleSegments').checked;
 
             if (!date || !startTime || !endTime || !tasks) {
-
                 alert('Vänligen fyll i alla obligatoriska fält');
-
                 return;
-
             }
 
             const timeResult = calculateWorkingHours();
-
             if (!timeResult || (timeResult.regularHours === 0 && timeResult.compTime === 0)) {
-
                 alert('Sluttid måste vara efter starttid');
-
                 return;
-
             }
 
             // Check if comment is required for overtime
-
             if (timeResult.compTime > 0 && !comment.trim()) {
-
                 alert('Kommentar är obligatorisk när det blir övertid. Vänligen förklara anledningen.');
-
                 return;
-
             }
 
             let segmentEntries = [];
 
             if (isMultipleSegments) {
-
                 // Handle multiple segments
-
                 const serviceHours = parseFloat(document.getElementById('serviceHours').value) || 0;
-
                 const supportHours = parseFloat(document.getElementById('supportHours').value) || 0;
-
                 const rentalHours = parseFloat(document.getElementById('rentalHours').value) || 0;
-
                 
-
                 const totalDistributed = serviceHours + supportHours + rentalHours;
-
                 
-
                 if (totalDistributed === 0) {
-
                     alert('Du måste fördela arbetstiden mellan minst ett segment');
-
                     return;
-
                 }
-
                 
-
                 if (Math.abs(totalDistributed - timeResult.regularHours) > 0.1) {
-
                     if (!confirm(`Fördelad tid (${totalDistributed.toFixed(1)}h) matchar inte arbetstiden (${timeResult.regularHours.toFixed(1)}h). Vill du fortsätta ändå?`)) {
-
                         return;
-
                     }
-
                 }
 
                 // Create entries for each segment with hours > 0
-
                 if (serviceHours > 0) {
-
                     segmentEntries.push({
-
                         segment: 'Service',
-
                         hours: serviceHours
-
                     });
-
                 }
-
                 if (supportHours > 0) {
-
                     segmentEntries.push({
-
                         segment: 'Support',
-
                         hours: supportHours
-
                     });
-
                 }
-
                 if (rentalHours > 0) {
-
                     segmentEntries.push({
-
                         segment: 'Rental',
-
                         hours: rentalHours
-
                     });
-
                 }
-
             } else {
-
                 // Handle single segment
-
                 const segment = document.getElementById('segmentSelect').value;
-
                 if (!segment) {
-
                     alert('Vänligen välj ett segment');
-
                     return;
-
                 }
-
                 
-
                 segmentEntries.push({
-
                     segment: segment,
-
                     hours: timeResult.regularHours
-
                 });
-
             }
 
             // Create time entries for each segment
-
             segmentEntries.forEach((segmentEntry, index) => {
-
                 const entry = {
-
                     id: Date.now() + index,
-
                     name: currentUser.name,
-
                     username: currentUser.username,
-
                     department: currentUser.department,
-
                     segment: segmentEntry.segment,
-
                     date: date,
-
                     startTime: startTime,
-
                     endTime: endTime,
-
                     hours: segmentEntry.hours,
-
                     tasks: tasks,
-
                     comment: comment,
-
                     timestamp: new Date().toISOString(),
-
                     isMultiSegment: isMultipleSegments,
-
                     segmentCount: segmentEntries.length
-
                 };
-
                 timeEntries.push(entry);
-
             });
 
             // Handle comp time if any (only create one comp time entry)
-
             if (timeResult.compTime > 0) {
-
                 const compEntry = {
-
                     id: Date.now() + 1000,
-
                     name: currentUser.name,
-
                     username: currentUser.username,
-
                     date: date,
-
                     hours: timeResult.compTime,
-
                     earned: new Date().toISOString(),
-
                     expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 3 months
-
                     used: false,
-
                     segment: 'Övertid'
-
                 };
-
                 compTimeEntries.push(compEntry);
-
                 localStorage.setItem('compTimeEntries', JSON.stringify(compTimeEntries));
-
             }
 
             localStorage.setItem('timeEntries', JSON.stringify(timeEntries));
 
             // Reset form
-
             document.getElementById('timeForm').reset();
-
             document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
-
             document.getElementById('singleSegment').checked = true;
-
             toggleSegmentMode();
-
             calculateWorkingHours(); // Reset calculation display
 
             const segmentSummary = isMultipleSegments ? 
-
                 ` Fördelat på: ${segmentEntries.map(s => `${s.segment} (${s.hours.toFixed(1)}h)`).join(', ')}` : 
-
                 '';
 
             alert('Tid registrerad framgångsrikt!' + segmentSummary + (timeResult.compTime > 0 ? ` ${timeResult.compTime.toFixed(1)}h komptid tillagd.` : ''));
-
             updateWeekSummary();
-
             updateCompTimeBalance();
-
         });
 
         // Copy previous day functionality
-
         function copyPreviousDay() {
-
             const userEntries = timeEntries.filter(entry => entry.name === currentUser.name);
-
             if (userEntries.length === 0) {
-
                 alert('Inga tidigare rapporter att kopiera');
-
                 return;
-
             }
 
             const lastEntry = userEntries[userEntries.length - 1];
-
             document.getElementById('startTimeInput').value = lastEntry.startTime || '';
-
             document.getElementById('endTimeInput').value = lastEntry.endTime || '';
-
             document.getElementById('segmentSelect').value = lastEntry.segment;
-
             document.getElementById('taskInput').value = lastEntry.tasks;
-
             document.getElementById('commentInput').value = lastEntry.comment;
-
             calculateWorkingHours();
-
         }
 
         // Clean expired comp time
-
         function cleanExpiredCompTime() {
-
             const now = new Date();
-
             compTimeEntries = compTimeEntries.filter(entry => new Date(entry.expires) > now);
-
             localStorage.setItem('compTimeEntries', JSON.stringify(compTimeEntries));
-
         }
 
         // Update comp time balance
-
         function updateCompTimeBalance() {
-
             if (!currentUser) return;
-
             
-
             cleanExpiredCompTime();
-
             
-
             const userCompTime = compTimeEntries.filter(entry => entry.name === currentUser.name);
-
             const totalEarned = userCompTime.reduce((sum, entry) => sum + entry.hours, 0);
-
             const totalUsed = userCompTime.filter(entry => entry.used).reduce((sum, entry) => sum + entry.hours, 0);
-
             const remaining = totalEarned - totalUsed;
 
             document.getElementById('totalCompTime').textContent = totalEarned.toFixed(1) + 'h';
-
             document.getElementById('usedCompTime').textContent = totalUsed.toFixed(1) + 'h';
-
             document.getElementById('remainingCompTime').textContent = remaining.toFixed(1) + 'h';
-
         }
 
         // Update week summary for current user
-
         function updateWeekSummary() {
-
             if (!currentUser) return;
 
             const today = new Date();
-
             const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 1));
-
             const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 7));
 
             const weekEntries = timeEntries.filter(entry => {
-
                 const entryDate = new Date(entry.date);
-
                 return entry.name === currentUser.name && 
-
                        entryDate >= startOfWeek && entryDate <= endOfWeek;
-
             });
 
             const weekCompTime = compTimeEntries.filter(entry => {
-
                 const entryDate = new Date(entry.date);
-
                 return entry.name === currentUser.name && 
-
                        entryDate >= startOfWeek && entryDate <= endOfWeek;
-
             });
 
             let totalHours = 0;
-
             let serviceHours = 0;
-
             let supportHours = 0;
-
             let rentalHours = 0;
-
             let compTimeHours = 0;
 
             weekEntries.forEach(entry => {
-
                 totalHours += entry.hours;
-
                 if (entry.segment === 'Service') serviceHours += entry.hours;
-
                 if (entry.segment === 'Support') supportHours += entry.hours;
-
                 if (entry.segment === 'Rental') rentalHours += entry.hours;
-
             });
 
             weekCompTime.forEach(entry => {
-
                 compTimeHours += entry.hours;
-
             });
 
             document.getElementById('weekHours').textContent = totalHours.toFixed(1) + 'h';
-
             document.getElementById('weekService').textContent = serviceHours.toFixed(1) + 'h';
-
             document.getElementById('weekSupport').textContent = supportHours.toFixed(1) + 'h';
-
             document.getElementById('weekRental').textContent = rentalHours.toFixed(1) + 'h';
-
             document.getElementById('weekCompTime').textContent = compTimeHours.toFixed(1) + 'h';
-
             
-
             updateCompTimeBalance();
-
         }
 
         // Update my reports
-
         function updateMyReports() {
-
             if (!currentUser) return;
 
             const monthFilter = document.getElementById('monthFilter').value;
-
             let userEntries = timeEntries.filter(entry => entry.name === currentUser.name);
 
             if (monthFilter) {
-
                 userEntries = userEntries.filter(entry => entry.date.startsWith(monthFilter));
-
             }
 
             // Update summary cards
-
             let totalHours = 0;
-
             let serviceHours = 0;
-
             let supportHours = 0;
-
             let rentalHours = 0;
 
             userEntries.forEach(entry => {
-
                 totalHours += entry.hours;
-
                 if (entry.segment === 'Service') serviceHours += entry.hours;
-
                 if (entry.segment === 'Support') supportHours += entry.hours;
-
                 if (entry.segment === 'Rental') rentalHours += entry.hours;
-
             });
 
             // Calculate comp time for this month
-
             const userCompTime = compTimeEntries.filter(entry => {
-
                 if (entry.name !== currentUser.name) return false;
-
                 if (monthFilter) {
-
                     return entry.date.startsWith(monthFilter);
-
                 }
-
                 return true;
-
             });
-
             const compTimeHours = userCompTime.reduce((sum, entry) => sum + entry.hours, 0);
 
             document.getElementById('myTotalHours').textContent = totalHours.toFixed(1) + 'h';
-
             document.getElementById('myServiceHours').textContent = serviceHours.toFixed(1) + 'h';
-
             document.getElementById('mySupportHours').textContent = supportHours.toFixed(1) + 'h';
-
             document.getElementById('myRentalHours').textContent = rentalHours.toFixed(1) + 'h';
-
             document.getElementById('myCompTimeHours').textContent = compTimeHours.toFixed(1) + 'h';
 
             // Update table
-
             const tableBody = document.getElementById('myReportsTableBody');
-
             tableBody.innerHTML = '';
 
             // Group entries by date and combine multi-segment entries
-
             const groupedEntries = {};
-
             userEntries.forEach(entry => {
-
                 const key = entry.date;
-
                 if (!groupedEntries[key]) {
-
                     groupedEntries[key] = {
-
                         date: entry.date,
-
                         startTime: entry.startTime,
-
                         endTime: entry.endTime,
-
                         tasks: entry.tasks,
-
                         comment: entry.comment,
-
                         segments: [],
-
                         totalHours: 0,
-
                         isMultiSegment: entry.isMultiSegment || false,
-
                         entries: []
-
                     };
-
                 }
-
                 groupedEntries[key].segments.push({
-
                     segment: entry.segment,
-
                     hours: entry.hours
-
                 });
-
                 groupedEntries[key].totalHours += entry.hours;
-
                 groupedEntries[key].entries.push(entry);
-
             });
 
             Object.values(groupedEntries).sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(group => {
-
                 // Find comp time for this date
-
                 const entryCompTime = compTimeEntries.find(ct => 
-
                     ct.name === currentUser.name && 
-
                     ct.date === group.date
-
                 );
-
                 const compTimeHours = entryCompTime ? entryCompTime.hours : 0;
 
                 const row = document.createElement('tr');
-
                 
-
                 // Create segment display
-
                 let segmentDisplay = '';
-
                 if (group.isMultiSegment && group.segments.length > 1) {
-
                     segmentDisplay = group.segments.map(s => 
-
                         `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mr-1 mb-1 ${
-
                             s.segment === 'Service' ? 'bg-blue-900 text-blue-300 border border-blue-700' :
-
                             s.segment === 'Support' ? 'bg-purple-900 text-purple-300 border border-purple-700' :
-
                             'bg-orange-900 text-orange-300 border border-orange-700'
-
                         }">
-
                             ${s.segment}: ${s.hours.toFixed(1)}h
-
                         </span>`
-
                     ).join('');
-
                 } else {
-
                     const segment = group.segments[0];
-
                     segmentDisplay = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-
                         segment.segment === 'Service' ? 'bg-blue-900 text-blue-300 border border-blue-700' :
-
                         segment.segment === 'Support' ? 'bg-purple-900 text-purple-300 border border-purple-700' :
-
                         'bg-orange-900 text-orange-300 border border-orange-700'
-
                     }">
-
                         ${segment.segment}
-
                     </span>`;
-
                 }
 
                 row.innerHTML = `
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${group.date}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${group.startTime || '-'}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${group.endTime || '-'}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${group.totalHours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm ${compTimeHours > 0 ? 'text-yellow-400 font-medium' : 'text-gray-400'}">${compTimeHours > 0 ? compTimeHours.toFixed(1) + 'h' : '-'}</td>
-
                     <td class="px-6 py-4 text-sm text-gray-300">
-
                         ${segmentDisplay}
-
                     </td>
-
                     <td class="px-6 py-4 text-sm text-white">${group.tasks}</td>
-
                     <td class="px-6 py-4 text-sm text-gray-300 ${compTimeHours > 0 && group.comment ? 'font-medium' : ''}">${group.comment || '-'}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
                         ${group.entries.map(entry => 
-
                             `<button onclick="editEntry(${entry.id})" class="text-blue-400 hover:text-blue-300 mr-1 text-xs">Redigera</button>
-
                              <button onclick="deleteEntry(${entry.id})" class="text-red-400 hover:text-red-300 mr-1 text-xs">Ta bort</button>`
-
                         ).join('<br>')}
-
                     </td>
-
                 `;
-
                 tableBody.appendChild(row);
-
             });
-
         }
 
         // Admin functions
-
         function updateSummary() {
-
             if (!isAdmin) return;
 
             const fromDate = document.getElementById('fromDate').value;
-
             const toDate = document.getElementById('toDate').value;
-
             const employeeFilter = document.getElementById('employeeFilter').value;
-
             const segmentFilter = document.getElementById('segmentFilter').value;
 
             filteredEntries = timeEntries.filter(entry => {
-
                 let include = true;
-
                 if (fromDate && entry.date < fromDate) include = false;
-
                 if (toDate && entry.date > toDate) include = false;
-
                 if (employeeFilter && entry.name !== employeeFilter) include = false;
-
                 if (segmentFilter && entry.segment !== segmentFilter) include = false;
-
                 return include;
-
             });
 
             // Calculate totals
-
             let totalHours = 0;
-
             let serviceHours = 0;
-
             let supportHours = 0;
-
             let rentalHours = 0;
 
             const employeeStats = {};
 
             filteredEntries.forEach(entry => {
-
                 totalHours += entry.hours;
-
                 if (entry.segment === 'Service') serviceHours += entry.hours;
-
                 if (entry.segment === 'Support') supportHours += entry.hours;
-
                 if (entry.segment === 'Rental') rentalHours += entry.hours;
 
                 if (!employeeStats[entry.name]) {
-
                     employeeStats[entry.name] = {
-
                         totalHours: 0,
-
                         serviceHours: 0,
-
                         supportHours: 0,
-
                         rentalHours: 0,
-
                         lastEntry: entry.date
-
                     };
-
                 }
-
                 employeeStats[entry.name].totalHours += entry.hours;
-
                 if (entry.segment === 'Service') employeeStats[entry.name].serviceHours += entry.hours;
-
                 if (entry.segment === 'Support') employeeStats[entry.name].supportHours += entry.hours;
-
                 if (entry.segment === 'Rental') employeeStats[entry.name].rentalHours += entry.hours;
-
                 if (entry.date > employeeStats[entry.name].lastEntry) {
-
                     employeeStats[entry.name].lastEntry = entry.date;
-
                 }
-
             });
 
             // Calculate comp time totals
-
             const filteredCompTime = compTimeEntries.filter(entry => {
-
                 let include = true;
-
                 if (fromDate && entry.date < fromDate) include = false;
-
                 if (toDate && entry.date > toDate) include = false;
-
                 if (employeeFilter && entry.name !== employeeFilter) include = false;
-
                 if (segmentFilter && entry.segment !== segmentFilter) include = false;
-
                 return include;
-
             });
-
             const compTimeTotal = filteredCompTime.reduce((sum, entry) => sum + entry.hours, 0);
 
             // Update cards
-
             document.getElementById('totalHours').textContent = totalHours.toFixed(1) + 'h';
-
             document.getElementById('serviceHours').textContent = serviceHours.toFixed(1) + 'h';
-
             document.getElementById('supportHours').textContent = supportHours.toFixed(1) + 'h';
-
             document.getElementById('rentalHours').textContent = rentalHours.toFixed(1) + 'h';
-
             document.getElementById('compTimeHours').textContent = compTimeTotal.toFixed(1) + 'h';
 
             // Update top performers
-
             const topPerformers = Object.entries(employeeStats)
-
                 .sort(([,a], [,b]) => b.totalHours - a.totalHours)
-
                 .slice(0, 5);
 
             const topPerformersDiv = document.getElementById('topPerformers');
-
             topPerformersDiv.innerHTML = '';
 
             topPerformers.forEach(([name, stats], index) => {
-
                 const div = document.createElement('div');
-
                 div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
-
                 div.innerHTML = `
-
                     <div class="flex items-center">
-
                         <span class="text-lg font-bold text-gray-600 mr-3">#${index + 1}</span>
-
                         <span class="font-medium">${name}</span>
-
-                        <span class="ml-2 text-sm text-gray-500">(${stats.department})</span>
-
                     </div>
-
                     <span class="font-bold text-blue-600">${stats.totalHours.toFixed(1)}h</span>
-
                 `;
-
                 topPerformersDiv.appendChild(div);
-
             });
 
-            // Update all employees summary
-
-            const allEmployees = ['Ivan', 'Dragan', 'Elliot', 'Viggo', 'Anders', 'Per', 'Alexander', 'Olle'];
-
+            // Update all employees summary - dynamically from user accounts
+            const allEmployees = userAccounts.filter(u => u.active && u.role === 'user').map(u => u.name);
             const allEmployeesSummaryDiv = document.getElementById('allEmployeesSummary');
-
             allEmployeesSummaryDiv.innerHTML = '';
 
             allEmployees.forEach(employeeName => {
-
                 const stats = employeeStats[employeeName] || {
-
                     totalHours: 0,
-
                     serviceHours: 0,
-
                     supportHours: 0,
-
                     rentalHours: 0,
-
                     lastEntry: 'Ingen registrering'
-
                 };
 
                 const div = document.createElement('div');
-
                 div.className = 'bg-gray-50 rounded-lg p-4';
-
                 div.innerHTML = `
-
                     <div class="flex items-center justify-between mb-2">
-
                         <h4 class="font-semibold text-gray-800">${employeeName}</h4>
-
                     </div>
-
                     <div class="space-y-1 text-sm">
-
                         <div class="flex justify-between">
-
                             <span class="text-gray-600">Totalt:</span>
-
                             <span class="font-medium">${stats.totalHours.toFixed(1)}h</span>
-
                         </div>
-
                         <div class="flex justify-between">
-
                             <span class="text-gray-600">Service:</span>
-
                             <span class="text-blue-600">${stats.serviceHours.toFixed(1)}h</span>
-
                         </div>
-
                         <div class="flex justify-between">
-
                             <span class="text-gray-600">Support:</span>
-
                             <span class="text-green-600">${stats.supportHours.toFixed(1)}h</span>
-
                         </div>
-
                         <div class="flex justify-between">
-
                             <span class="text-gray-600">Rental:</span>
-
                             <span class="text-purple-600">${stats.rentalHours.toFixed(1)}h</span>
-
                         </div>
-
                         <div class="pt-2 border-t border-gray-200">
-
                             <span class="text-xs text-gray-500">Senast: ${stats.lastEntry}</span>
-
                         </div>
-
                     </div>
-
                 `;
-
                 allEmployeesSummaryDiv.appendChild(div);
-
             });
 
             // Update table
-
             const tableBody = document.getElementById('summaryTableBody');
-
             tableBody.innerHTML = '';
 
             Object.entries(employeeStats).forEach(([name, stats]) => {
-
                 const row = document.createElement('tr');
-
                 row.innerHTML = `
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${name}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${stats.totalHours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${stats.serviceHours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${stats.supportHours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${stats.rentalHours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.lastEntry}</td>
-
                 `;
-
                 tableBody.appendChild(row);
-
             });
-
         }
 
         function updateAdminView() {
-
             if (!isAdmin) return;
 
-            // Check for absentees (no entries in last 3 days)
-
+            // Check for absentees (no entries in last 3 days) - dynamically from user accounts
             const threeDaysAgo = new Date();
-
             threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
-            const allEmployees = ['Ivan', 'Dragan', 'Elliot', 'Viggo', 'Anders', 'Per', 'Alexander', 'Olle'];
-
+            const allEmployees = userAccounts.filter(u => u.active && u.role === 'user').map(u => u.name);
             const recentEntries = timeEntries.filter(entry => new Date(entry.date) >= threeDaysAgo);
-
             const activeEmployees = [...new Set(recentEntries.map(entry => entry.name))];
-
             const absentees = allEmployees.filter(emp => !activeEmployees.includes(emp));
 
             const warningsDiv = document.getElementById('absenteeWarnings');
-
             if (absentees.length > 0) {
-
                 warningsDiv.innerHTML = `Följande personal har inte rapporterat tid på 3 dagar: ${absentees.join(', ')}`;
-
             } else {
-
                 warningsDiv.innerHTML = 'Alla anställda har rapporterat tid nyligen.';
-
             }
 
             // Update admin table
-
             const tableBody = document.getElementById('adminTableBody');
-
             tableBody.innerHTML = '';
 
             timeEntries.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(entry => {
-
                 const row = document.createElement('tr');
-
                 row.innerHTML = `
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.date}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.name}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.startTime || '-'}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.endTime || '-'}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.hours.toFixed(1)}h</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-
                             entry.segment === 'Service' ? 'bg-blue-100 text-blue-800' :
-
-                            entry.segment === 'Install' ? 'bg-green-100 text-green-800' :
-
-                            'bg-purple-100 text-purple-800'
-
+                            entry.segment === 'Support' ? 'bg-purple-100 text-purple-800' :
+                            'bg-orange-100 text-orange-800'
                         }">
-
                             ${entry.segment}
-
                         </span>
-
                     </td>
-
                     <td class="px-6 py-4 text-sm text-gray-900">${entry.tasks}</td>
-
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
                         <button onclick="editEntry(${entry.id})" class="text-blue-600 hover:text-blue-900 mr-2">Redigera</button>
-
                         <button onclick="deleteEntry(${entry.id})" class="text-red-600 hover:text-red-900">Ta bort</button>
-
                     </td>
-
                 `;
-
                 tableBody.appendChild(row);
-
             });
-
         }
 
         // Utility functions
-
         function applyFilters() {
-
             updateSummary();
-
         }
 
         function exportData() {
-
             const csvContent = "data:text/csv;charset=utf-8," 
-
                 + "Datum,Personal,Starttid,Sluttid,Arbetstid,Segment,Arbetsuppgifter,Kommentar\n"
-
                 + filteredEntries.map(entry => 
-
                     `${entry.date},${entry.name},${entry.startTime || ''},${entry.endTime || ''},${entry.hours.toFixed(1)},${entry.segment},"${entry.tasks}","${entry.comment || ''}"`
-
                 ).join("\n");
 
             const encodedUri = encodeURI(csvContent);
-
             const link = document.createElement("a");
-
             link.setAttribute("href", encodedUri);
-
             link.setAttribute("download", "tidsrapport.csv");
-
             document.body.appendChild(link);
-
             link.click();
-
             document.body.removeChild(link);
-
         }
 
         function editEntry(id) {
-
             const entry = timeEntries.find(e => e.id === id);
-
             if (!entry) return;
 
             const newStartTime = prompt('Ny starttid (HH:MM):', entry.startTime || '');
-
             const newEndTime = prompt('Ny sluttid (HH:MM):', entry.endTime || '');
-
             const newTasks = prompt('Nya arbetsuppgifter:', entry.tasks);
-
             const newComment = prompt('Ny kommentar:', entry.comment || '');
 
             if (newStartTime !== null && newEndTime !== null && newTasks !== null) {
-
                 // Calculate new hours if times are provided
-
                 if (newStartTime && newEndTime) {
-
                     const start = new Date(`2000-01-01T${newStartTime}`);
-
                     const end = new Date(`2000-01-01T${newEndTime}`);
-
                     if (end > start) {
-
                         const grossHours = (end - start) / (1000 * 60 * 60);
-
                         const lunchDeduction = grossHours >= 6 ? 1 : 0;
-
                         const netHours = Math.max(0, grossHours - lunchDeduction);
-
                         entry.hours = netHours;
-
                     }
-
                 }
-
                 
-
                 entry.startTime = newStartTime || entry.startTime;
-
                 entry.endTime = newEndTime || entry.endTime;
-
                 entry.tasks = newTasks || entry.tasks;
-
                 entry.comment = newComment;
-
                 localStorage.setItem('timeEntries', JSON.stringify(timeEntries));
-
                 
-
                 // Refresh current view
-
                 if (document.getElementById('myreportsContent').classList.contains('hidden') === false) {
-
                     updateMyReports();
-
                 } else if (document.getElementById('adminContent').classList.contains('hidden') === false) {
-
                     updateAdminView();
-
                 }
-
             }
-
         }
 
         function deleteEntry(id) {
-
             if (confirm('Är du säker på att du vill ta bort denna rapport?')) {
-
                 timeEntries = timeEntries.filter(e => e.id !== id);
-
                 localStorage.setItem('timeEntries', JSON.stringify(timeEntries));
-
                 
-
                 // Refresh current view
-
                 if (document.getElementById('myreportsContent').classList.contains('hidden') === false) {
-
                     updateMyReports();
-
                 } else if (document.getElementById('adminContent').classList.contains('hidden') === false) {
-
                     updateAdminView();
-
                 }
-
             }
-
-        }
-
-        // Helper function to get employee department
-
-        function getEmployeeDepartment(employeeName) {
-
-            const departments = {
-
-                'Ivan': 'Service',
-
-                'Dragan': 'Service', 
-
-                'Elliot': 'Service',
-
-                'Viggo': 'Install',
-
-                'Anders': 'Install',
-
-                'Per': 'Install',
-
-                'Alexander': 'Rental',
-
-                'Olle': 'Rental'
-
-            };
-
-            return departments[employeeName] || 'Unknown';
-
         }
 
         // Absence and vacation functions
-
         function updateAbsenceView() {
-
             if (!isAdmin) return;
-
             
-
             updateAbsenceSummary();
-
             updateAbsencesTable();
-
         }
 
         function updateVacationView() {
-
             if (!isAdmin) return;
-
             
-
             updateVacationSummary();
-
             updateVacationCalendar();
-
             updateVacationsTable();
-
         }
 
         function updateAbsenceSummary() {
-
             const today = new Date();
-
             const thisMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
-
             
-
             // Count current absences (ongoing today)
-
             const currentAbsences = absenceEntries.filter(entry => {
-
                 const fromDate = new Date(entry.fromDate);
-
                 const toDate = new Date(entry.toDate);
-
                 return fromDate <= today && toDate >= today;
-
             }).length;
 
             // Count comp time used
-
             const compTimeUsed = absenceEntries.filter(entry => 
-
                 entry.type === 'Komptid'
-
             ).length;
 
             // Monthly statistics
-
             const thisMonthAbsences = absenceEntries.filter(entry => 
-
                 entry.fromDate.startsWith(thisMonth)
-
             );
 
             const sickDays = thisMonthAbsences.filter(entry => entry.type === 'Sjukdom')
-
                 .reduce((sum, entry) => sum + calculateWorkingDays(entry.fromDate, entry.toDate), 0);
-
             
-
             const vabDays = thisMonthAbsences.filter(entry => entry.type === 'VAB')
-
                 .reduce((sum, entry) => sum + calculateWorkingDays(entry.fromDate, entry.toDate), 0);
-
             
-
             const compTimeDays = thisMonthAbsences.filter(entry => entry.type === 'Komptid')
-
                 .reduce((sum, entry) => sum + calculateWorkingDays(entry.fromDate, entry.toDate), 0);
 
             document.getElementById('currentAbsences').textContent = currentAbsences;
-
             document.getElementById('compTimeUsed').textContent = compTimeUsed;
-
             document.getElementById('sickDaysMonth').textContent = sickDays + ' dagar';
-
             document.getElementById('vabDaysMonth').textContent = vabDays + ' dagar';
-
-            document.getElementById('compTimeDaysMonth').textContent = compTimeDays + ' dagar';
-
-        }
-
-        function updateVacationSummary() {
-
-            const today = new Date();
-
-            
-
-            // Count planned vacations
-
-            const plannedVacations = vacationEntries.filter(entry => 
-
-                entry.status === 'Planerad' && new Date(entry.fromDate) > today
-
-            ).length;
-
-            // Count approved vacations
-
-            const approvedVacations = vacationEntries.filter(entry => 
-
-                entry.status === 'Godkänd'
-
-            ).length;
-
-            document.getElementById('plannedVacations').textContent = plannedVacations;
-
-            document.getElementById('approvedVacations').textContent = approvedVacations;
-
-            // Update upcoming vacations
-
-            const upcomingVacations = vacationEntries
-
-                .filter(entry => new Date(entry.fromDate) > today)
-
-                .sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate))
-
-                .slice(0, 5);
-
-            const upcomingDiv = document.getElementById('upcomingVacations');
-
-            upcomingDiv.innerHTML = '';
-
-            if (upcomingVacations.length === 0) {
-
-                upcomingDiv.innerHTML = '<p class="text-sm text-gray-500">Ingen kommande semester planerad</p>';
-
-            } else {
-
-                upcomingVacations.forEach(vacation => {
-
-                    const div = document.createElement('div');
-
-                    div.className = 'flex justify-between items-center p-2 bg-gray-50 rounded text-sm';
-
-                    div.innerHTML = `
-
-                        <span class="font-medium">${vacation.employee}</span>
-
-                        <span class="text-gray-600">${vacation.fromDate} - ${vacation.toDate}</span>
-
-                    `;
-
-                    upcomingDiv.appendChild(div);
-
-                });
-
-            }
-
-        }
-
-        function updateAbsencesTable() {
-
-            const typeFilter = document.getElementById('absenceFilterType').value;
-
-            const employeeFilter = document.getElementById('absenceFilterEmployee').value;
-
-            
-
-            let filteredAbsences = [...absenceEntries];
-
-            if (typeFilter) {
-
-                filteredAbsences = filteredAbsences.filter(entry => entry.type === typeFilter);
-
-            }
-
-            if (employeeFilter) {
-
-                filteredAbsences = filteredAbsences.filter(entry => entry.employee === employeeFilter);
-
-            }
-
-            const tableBody = document.getElementById('absencesTableBody');
-
-            tableBody.innerHTML = '';
-
-            filteredAbsences.sort((a, b) => new Date(b.fromDate) - new Date(a.fromDate)).forEach(entry => {
-
-                const fromDate = new Date(entry.fromDate);
-
-                const toDate = new Date(entry.toDate);
-
-                const days = calculateWorkingDays(entry.fromDate, entry.toDate);
-
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${entry.employee}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(entry.type)}">
-
-                            ${entry.type}
-
-                        </span>
-
-                    </td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.fromDate}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.toDate}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${days}</td>
-
-                    <td class="px-6 py-4 text-sm text-gray-500">${entry.comment || '-'}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
-                        <button onclick="editAbsence(${entry.id})" class="text-blue-600 hover:text-blue-900 mr-2">Redigera</button>
-
-                        <button onclick="deleteAbsence(${entry.id})" class="text-red-600 hover:text-red-900">Ta bort</button>
-
-                    </td>
-
-                `;
-
-                tableBody.appendChild(row);
-
-            });
-
-        }
-
-        function updateVacationsTable() {
-
-            const statusFilter = document.getElementById('vacationFilterStatus').value;
-
-            const employeeFilter = document.getElementById('vacationFilterEmployee').value;
-
-            
-
-            let filteredVacations = [...vacationEntries];
-
-            if (statusFilter) {
-
-                filteredVacations = filteredVacations.filter(entry => entry.status === statusFilter);
-
-            }
-
-            if (employeeFilter) {
-
-                filteredVacations = filteredVacations.filter(entry => entry.employee === employeeFilter);
-
-            }
-
-            const tableBody = document.getElementById('vacationsTableBody');
-
-            tableBody.innerHTML = '';
-
-            filteredVacations.sort((a, b) => new Date(b.fromDate) - new Date(a.fromDate)).forEach(entry => {
-
-                const fromDate = new Date(entry.fromDate);
-
-                const toDate = new Date(entry.toDate);
-
-                const days = calculateWorkingDays(entry.fromDate, entry.toDate);
-
-                
-
-                const statusClass = entry.status === 'Planerad' ? 'bg-yellow-100 text-yellow-800' :
-
-                                   entry.status === 'Godkänd' ? 'bg-green-100 text-green-800' :
-
-                                   'bg-gray-100 text-gray-800';
-
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${entry.employee}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.fromDate}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${entry.toDate}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${days}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
-
-                            ${entry.status}
-
-                        </span>
-
-                    </td>
-
-                    <td class="px-6 py-4 text-sm text-gray-500">${entry.notes || '-'}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
-                        <button onclick="editVacation(${entry.id})" class="text-blue-600 hover:text-blue-900 mr-2">Redigera</button>
-
-                        <button onclick="deleteVacation(${entry.id})" class="text-red-600 hover:text-red-900">Ta bort</button>
-
-                    </td>
-
-                `;
-
-                tableBody.appendChild(row);
-
-            });
-
-        }
-
-        function updateVacationCalendar() {
-
-            const calendarDiv = document.getElementById('vacationCalendar');
-
-            calendarDiv.innerHTML = '';
-
-            const allEmployees = ['Ivan', 'Dragan', 'Elliot', 'Viggo', 'Anders', 'Per', 'Alexander', 'Olle'];
-
-            
-
-            allEmployees.forEach(employee => {
-
-                const employeeVacations = vacationEntries.filter(v => v.employee === employee);
-
-                const upcomingVacation = employeeVacations.find(v => 
-
-                    new Date(v.fromDate) > new Date() && v.status !== 'Avslutad'
-
-                );
-
-                const div = document.createElement('div');
-
-                div.className = 'bg-gray-50 rounded-lg p-4';
-
-                div.innerHTML = `
-
-                    <div class="flex items-center justify-between mb-2">
-
-                        <h4 class="font-semibold text-gray-800">${employee}</h4>
-
-                        <span class="text-xs text-gray-500">${employeeVacations.length} planerade</span>
-
-                    </div>
-
-                    ${upcomingVacation ? `
-
-                        <div class="space-y-1 text-sm">
-
-                            <div class="flex justify-between">
-
-                                <span class="text-gray-600">Nästa semester:</span>
-
-                                <span class="font-medium">${upcomingVacation.fromDate}</span>
-
-                            </div>
-
-                            <div class="flex justify-between">
-
-                                <span class="text-gray-600">Till:</span>
-
-                                <span class="font-medium">${upcomingVacation.toDate}</span>
-
-                            </div>
-
-                            <div class="pt-2">
-
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-
-                                    upcomingVacation.status === 'Planerad' ? 'bg-yellow-100 text-yellow-800' :
-
-                                    upcomingVacation.status === 'Godkänd' ? 'bg-green-100 text-green-800' :
-
-                                    'bg-gray-100 text-gray-800'
-
-                                }">
-
-                                    ${upcomingVacation.status}
-
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    ` : `
-
-                        <p class="text-sm text-gray-500">Ingen planerad semester</p>
-
-                    `}
-
-                `;
-
-                calendarDiv.appendChild(div);
-
-            });
-
-        }
-
-        function getTypeColor(type) {
-
-            const colors = {
-
-                'Sjukdom': 'bg-red-100 text-red-800',
-
-                'VAB': 'bg-orange-100 text-orange-800',
-
-                'Semester': 'bg-green-100 text-green-800',
-
-                'Föräldraledighet': 'bg-purple-100 text-purple-800',
-
-                'Tjänstledighet': 'bg-blue-100 text-blue-800',
-
-                'Komptid': 'bg-yellow-100 text-yellow-800',
-
-                'Övrigt': 'bg-gray-100 text-gray-800'
-
-            };
-
-            return colors[type] || 'bg-gray-100 text-gray-800';
-
-        }
-
-        function calculateWorkingDays(fromDate, toDate) {
-
-            const start = new Date(fromDate);
-
-            const end = new Date(toDate);
-
-            let workingDays = 0;
-
-            
-
-            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-
-                const dayOfWeek = d.getDay();
-
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday (0) or Saturday (6)
-
-                    workingDays++;
-
-                }
-
-            }
-
-            return workingDays;
-
-        }
-
-        function editAbsence(id) {
-
-            const entry = absenceEntries.find(e => e.id === id) || vacationEntries.find(e => e.id === id);
-
-            if (!entry) return;
-
-            const newFromDate = prompt('Nytt från-datum (YYYY-MM-DD):', entry.fromDate);
-
-            const newToDate = prompt('Nytt till-datum (YYYY-MM-DD):', entry.toDate);
-
-            const newComment = prompt('Ny kommentar:', entry.comment || entry.notes || '');
-
-            if (newFromDate !== null && newToDate !== null) {
-
-                entry.fromDate = newFromDate || entry.fromDate;
-
-                entry.toDate = newToDate || entry.toDate;
-
-                if (entry.comment !== undefined) {
-
-                    entry.comment = newComment;
-
-                } else {
-
-                    entry.notes = newComment;
-
-                }
-
-                
-
-                if (absenceEntries.find(e => e.id === id)) {
-
-                    localStorage.setItem('absenceEntries', JSON.stringify(absenceEntries));
-
-                } else {
-
-                    localStorage.setItem('vacationEntries', JSON.stringify(vacationEntries));
-
-                }
-
-                
-
-                updateAbsenceView();
-
-            }
-
-        }
-
-        function editVacation(id) {
-
-            const entry = vacationEntries.find(e => e.id === id);
-
-            if (!entry) return;
-
-            const newFromDate = prompt('Nytt från-datum (YYYY-MM-DD):', entry.fromDate);
-
-            const newToDate = prompt('Nytt till-datum (YYYY-MM-DD):', entry.toDate);
-
-            const newStatus = prompt('Ny status (Planerad/Godkänd/Avslutad):', entry.status);
-
-            const newNotes = prompt('Nya anteckningar:', entry.notes || '');
-
-            if (newFromDate !== null && newToDate !== null && newStatus !== null) {
-
-                entry.fromDate = newFromDate || entry.fromDate;
-
-                entry.toDate = newToDate || entry.toDate;
-
-                entry.status = newStatus || entry.status;
-
-                entry.notes = newNotes;
-
-                
-
-                localStorage.setItem('vacationEntries', JSON.stringify(vacationEntries));
-
-                updateVacationView();
-
-            }
-
-        }
-
-        function deleteAbsence(id) {
-
-            if (confirm('Är du säker på att du vill ta bort denna frånvaro?')) {
-
-                absenceEntries = absenceEntries.filter(e => e.id !== id);
-
-                localStorage.setItem('absenceEntries', JSON.stringify(absenceEntries));
-
-                updateAbsenceView();
-
-            }
-
-        }
-
-        function deleteVacation(id) {
-
-            if (confirm('Är du säker på att du vill ta bort denna semesterplan?')) {
-
-                vacationEntries = vacationEntries.filter(e => e.id !== id);
-
-                localStorage.setItem('vacationEntries', JSON.stringify(vacationEntries));
-
-                updateVacationView();
-
-            }
-
-        }
-
-        // Form submissions for absence and vacation
-
-        document.getElementById('absenceForm').addEventListener('submit', function(e) {
-
-            e.preventDefault();
-
-            
-
-            const employee = document.getElementById('absenceEmployee').value;
-
-            const fromDate = document.getElementById('absenceFromDate').value;
-
-            const toDate = document.getElementById('absenceToDate').value;
-
-            const type = document.getElementById('absenceType').value;
-
-            const comment = document.getElementById('absenceComment').value;
-
-            if (!employee || !fromDate || !toDate || !type) {
-
-                alert('Vänligen fyll i alla obligatoriska fält');
-
-                return;
-
-            }
-
-            if (new Date(toDate) < new Date(fromDate)) {
-
-                alert('Till-datum måste vara efter från-datum');
-
-                return;
-
-            }
-
-            const entry = {
-
-                id: Date.now(),
-
-                employee: employee,
-
-                fromDate: fromDate,
-
-                toDate: toDate,
-
-                type: type,
-
-                comment: comment,
-
-                registeredBy: currentUser.name,
-
-                registeredAt: new Date().toISOString()
-
-            };
-
-            // If using comp time, deduct from available comp time
-
-            if (type === 'Komptid') {
-
-                const workingDays = calculateWorkingDays(fromDate, toDate);
-
-                const hoursNeeded = workingDays * 8; // Assuming 8h work days
-
-                
-
-                const userCompTime = compTimeEntries.filter(ct => 
-
-                    ct.name === employee && !ct.used && new Date(ct.expires) > new Date()
-
-                );
-
-                const availableHours = userCompTime.reduce((sum, ct) => sum + ct.hours, 0);
-
-                
-
-                if (availableHours < hoursNeeded) {
-
-                    alert(`Otillräcklig komptid. Behöver: ${hoursNeeded}h, Tillgänglig: ${availableHours.toFixed(1)}h`);
-
-                    return;
-
-                }
-
-                
-
-                // Mark comp time as used
-
-                let hoursToUse = hoursNeeded;
-
-                userCompTime.forEach(ct => {
-
-                    if (hoursToUse > 0) {
-
-                        if (ct.hours <= hoursToUse) {
-
-                            ct.used = true;
-
-                            hoursToUse -= ct.hours;
-
-                        } else {
-
-                            // Split the comp time entry
-
-                            const newEntry = {
-
-                                ...ct,
-
-                                id: Date.now() + Math.random(),
-
-                                hours: hoursToUse,
-
-                                used: true
-
-                            };
-
-                            ct.hours -= hoursToUse;
-
-                            compTimeEntries.push(newEntry);
-
-                            hoursToUse = 0;
-
-                        }
-
-                    }
-
-                });
-
-                localStorage.setItem('compTimeEntries', JSON.stringify(compTimeEntries));
-
-            }
-
-            absenceEntries.push(entry);
-
-            localStorage.setItem('absenceEntries', JSON.stringify(absenceEntries));
-
-            // Reset form
-
-            document.getElementById('absenceForm').reset();
-
-            alert('Frånvaro registrerad framgångsrikt!');
-
-            updateAbsenceView();
-
-        });
-
-        document.getElementById('vacationForm').addEventListener('submit', function(e) {
-
-            e.preventDefault();
-
-            
-
-            const employee = document.getElementById('vacationEmployee').value;
-
-            const fromDate = document.getElementById('vacationFromDate').value;
-
-            const toDate = document.getElementById('vacationToDate').value;
-
-            const status = document.getElementById('vacationStatus').value;
-
-            const notes = document.getElementById('vacationNotes').value;
-
-            if (!employee || !fromDate || !toDate || !status) {
-
-                alert('Vänligen fyll i alla obligatoriska fält');
-
-                return;
-
-            }
-
-            if (new Date(toDate) < new Date(fromDate)) {
-
-                alert('Till-datum måste vara efter från-datum');
-
-                return;
-
-            }
-
-            const entry = {
-
-                id: Date.now(),
-
-                employee: employee,
-
-                fromDate: fromDate,
-
-                toDate: toDate,
-
-                status: status,
-
-                notes: notes,
-
-                plannedBy: currentUser.name,
-
-                plannedAt: new Date().toISOString()
-
-            };
-
-            vacationEntries.push(entry);
-
-            localStorage.setItem('vacationEntries', JSON.stringify(vacationEntries));
-
-            // Reset form
-
-            document.getElementById('vacationForm').reset();
-
-            alert('Semester planerad framgångsrikt!');
-
-            updateAbsenceView();
-
-        });
-
-        // User Management Functions
-
-        function updateUsersView() {
-
-            if (!isAdmin) return;
-
-            
-
-            updateUserStatistics();
-
-            updateUsersTable();
-
-            updateRecentLogins();
-
-        }
-
-        function updateUserStatistics() {
-
-            const totalUsers = userAccounts.length;
-
-            const activeUsers = userAccounts.filter(u => u.active).length;
-
-            
-
-            document.getElementById('totalUsers').textContent = totalUsers;
-
-            document.getElementById('activeUsers').textContent = activeUsers;
-
-        }
-
-        function updateRecentLogins() {
-
-            const recentLogins = userAccounts
-
-                .filter(u => u.lastLogin)
-
-                .sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin))
-
-                .slice(0, 5);
-
-            const recentLoginsDiv = document.getElementById('recentLogins');
-
-            recentLoginsDiv.innerHTML = '';
-
-            if (recentLogins.length === 0) {
-
-                recentLoginsDiv.innerHTML = '<p class="text-sm text-gray-400">Inga inloggningar ännu</p>';
-
-            } else {
-
-                recentLogins.forEach(user => {
-
-                    const div = document.createElement('div');
-
-                    div.className = 'flex justify-between items-center p-2 bg-gray-700 rounded text-sm';
-
-                    const loginDate = new Date(user.lastLogin).toLocaleString('sv-SE');
-
-                    div.innerHTML = `
-
-                        <span class="font-medium text-white">${user.name}</span>
-
-                        <span class="text-gray-300">${loginDate}</span>
-
-                    `;
-
-                    recentLoginsDiv.appendChild(div);
-
-                });
-
-            }
-
-        }
-
-        function updateUsersTable() {
-
-            const roleFilter = document.getElementById('userFilterRole').value;
-
-            const statusFilter = document.getElementById('userFilterStatus').value;
-
-            
-
-            let filteredUsers = [...userAccounts];
-
-            if (roleFilter) {
-
-                filteredUsers = filteredUsers.filter(user => user.role === roleFilter);
-
-            }
-
-            if (statusFilter) {
-
-                const isActive = statusFilter === 'active';
-
-                filteredUsers = filteredUsers.filter(user => user.active === isActive);
-
-            }
-
-            const tableBody = document.getElementById('usersTableBody');
-
-            tableBody.innerHTML = '';
-
-            filteredUsers.sort((a, b) => a.name.localeCompare(b.name)).forEach(user => {
-
-                const row = document.createElement('tr');
-
-                const lastLogin = user.lastLogin ? 
-
-                    new Date(user.lastLogin).toLocaleString('sv-SE') : 
-
-                    'Aldrig';
-
-                
-
-                const statusClass = user.active ? 
-
-                    'bg-green-900 text-green-300 border border-green-700' : 
-
-                    'bg-red-900 text-red-300 border border-red-700';
-
-                
-
-                const roleClass = user.role === 'admin' ? 
-
-                    'bg-purple-900 text-purple-300 border border-purple-700' : 
-
-                    'bg-blue-900 text-blue-300 border border-blue-700';
-
-                row.innerHTML = `
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${user.username}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.name}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${user.department}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleClass}">
-
-                            ${user.role === 'admin' ? 'Administratör' : 'Användare'}
-
-                        </span>
-
-                    </td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
-
-                            ${user.active ? 'Aktiv' : 'Inaktiv'}
-
-                        </span>
-
-                    </td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${lastLogin}</td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-
-                        <button onclick="editUser(${user.id})" class="text-blue-400 hover:text-blue-300 mr-2">Redigera</button>
-
-                        <button onclick="toggleUserStatus(${user.id})" class="text-yellow-400 hover:text-yellow-300 mr-2">
-
-                            ${user.active ? 'Inaktivera' : 'Aktivera'}
-
-                        </button>
-
-                        ${user.id !== 1 ? `<button onclick="deleteUser(${user.id})" class="text-red-400 hover:text-red-300">Ta bort</button>` : ''}
-
-                    </td>
-
-                `;
-
-                tableBody.appendChild(row);
-
-            });
-
-        }
-
-        function createUser(username, password, name, department, role) {
-
-            // Check if username already exists
-
-            if (userAccounts.find(u => u.username === username)) {
-
-                alert('Användarnamnet finns redan!');
-
-                return false;
-
-            }
-
-            const newUser = {
-
-                id: Math.max(...userAccounts.map(u => u.id)) + 1,
-
-                username: username,
-
-                password: password,
-
-                name: name,
-
-                role: role,
-
-                department: department,
-
-                active: true,
-
-                createdAt: new Date().toISOString(),
-
-                lastLogin: null
-
-            };
-
-            userAccounts.push(newUser);
-
-            localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
-
-            return true;
-
-        }
-
-        function editUser(id) {
-
-            const user = userAccounts.find(u => u.id === id);
-
-            if (!user) return;
-
-            const newName = prompt('Nytt namn:', user.name);
-
-            const newDepartment = prompt('Ny avdelning (Service/Support/Rental/Administration):', user.department);
-
-            
-
-            if (newName !== null && newDepartment !== null) {
-
-                user.name = newName || user.name;
-
-                user.department = newDepartment || user.department;
-
-                localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
-
-                updateUsersView();
-
-                alert('Användare uppdaterad!');
-
-            }
-
-        }
-
-        function toggleUserStatus(id) {
-
-            const user = userAccounts.find(u => u.id === id);
-
-            if (!user) return;
-
-            if (user.id === 1) {
-
-                alert('Kan inte inaktivera huvudadministratören!');
-
-                return;
-
-            }
-
-            const action = user.active ? 'inaktivera' : 'aktivera';
-
-            if (confirm(`Är du säker på att du vill ${action} ${user.name}?`)) {
-
-                user.active = !user.active;
-
-                localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
-
-                updateUsersView();
-
-                alert(`Användare ${user.active ? 'aktiverad' : 'inaktiverad'}!`);
-
-            }
-
-        }
-
-        function deleteUser(id) {
-
-            const user = userAccounts.find(u => u.id === id);
-
-            if (!user) return;
-
-            if (user.id === 1) {
-
-                alert('Kan inte ta bort huvudadministratören!');
-
-                return;
-
-            }
-
-            if (confirm(`Är du säker på att du vill ta bort ${user.name}? Detta kan inte ångras!`)) {
-
-                userAccounts = userAccounts.filter(u => u.id !== id);
-
-                localStorage.setItem('userAccounts', JSON.stringify(userAccounts));
-
-                updateUsersView();
-
-                alert('Användare borttagen!');
-
-            }
-
-        }
-
-        // Create user form submission
-
-        document.getElementById('createUserForm').addEventListener('submit', function(e) {
-
-            e.preventDefault();
-
-            
-
-            const username = document.getElementById('newUsername').value.trim();
-
-            const password = document.getElementById('newPassword').value;
-
-            const name = document.getElementById('newFullName').value.trim();
-
-            const department = document.getElementById('newDepartment').value;
-
-            const role = document.getElementById('newRole').value;
-
-            if (!username || !password || !name) {
-
-                alert('Vänligen fyll i alla obligatoriska fält');
-
-                return;
-
-            }
-
-            if (password.length < 6) {
-
-                alert('Lösenordet måste vara minst 6 tecken långt');
-
-                return;
-
-            }
-
-            if (createUser(username, password, name, department, role)) {
-
-                // Reset form
-
-                document.getElementById('createUserForm').reset();
-
-                updateUsersView();
-
-                alert('Användare skapad framgångsrikt!');
-
-            }
-
-        });
-
-        // Event listeners
-
-        document.getElementById('monthFilter').addEventListener('change', updateMyReports);
-
-        document.getElementById('absenceFilterType').addEventListener('change', updateAbsencesTable);
-
-        document.getElementById('absenceFilterEmployee').addEventListener('change', updateAbsencesTable);
-
-        document.getElementById('vacationFilterStatus').addEventListener('change', updateVacationsTable);
-
-        document.getElementById('vacationFilterEmployee').addEventListener('change', updateVacationsTable);
-
-        document.getElementById('userFilterRole').addEventListener('change', updateUsersTable);
-
-        document.getElementById('userFilterStatus').addEventListener('change', updateUsersTable);
-
-        
-
-        // Set default date filters for admin
-
-        const today = new Date();
-
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-        document.getElementById('fromDate').value = firstDayOfMonth.toISOString().split('T')[0];
-
-        document.getElementById('toDate').value = today.toISOString().split('T')[0];
-
-    </script>
-
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b97c9990c9f774',t:'MTc1NDU5ODE1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-
-</html>
+            document.getElementById('compTim<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bd073f2453cfd7',t:'MTc1NDYzNTI5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
